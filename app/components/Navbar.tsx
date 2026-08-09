@@ -11,6 +11,17 @@ import {
   FaWhatsapp,
 } from "react-icons/fa";
 
+const navigation = [
+  ["/", "Home"],
+  ["/about", "About"],
+  ["/gallery", "Gallery"],
+  ["/history", "History"],
+  ["/videos", "Videos"],
+  ["/timings", "Timings"],
+  ["/location", "Location"],
+  ["/contact", "Contact"],
+];
+
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -20,7 +31,7 @@ export default function Navbar() {
 
         {/* Logo */}
         <a
-          href="#home"
+          href="/"
           onClick={() => setMenuOpen(false)}
           className="flex items-center gap-3"
         >
@@ -45,16 +56,8 @@ export default function Navbar() {
         </a>
 
         {/* Desktop Navigation */}
-        <nav className="hidden items-center gap-8 md:flex">
-          {[
-            ["#home", "Home"],
-            ["#about", "About"],
-            ["#gallery", "Gallery"],
-            ["#history", "History"],
-            ["#timings", "Timings"],
-            ["#location", "Location"],
-            ["#contact", "Contact"],
-          ].map(([href, label]) => (
+        <nav className="hidden items-center gap-6 md:flex">
+          {navigation.map(([href, label]) => (
             <a
               key={label}
               href={href}
@@ -110,8 +113,10 @@ export default function Navbar() {
 
         {/* Mobile Menu Button */}
         <button
+          type="button"
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle Menu"
+          aria-expanded={menuOpen}
           className="text-3xl text-yellow-300 transition hover:text-yellow-400 md:hidden"
         >
           {menuOpen ? <FaTimes /> : <FaBars />}
@@ -122,16 +127,7 @@ export default function Navbar() {
       {menuOpen && (
         <div className="border-t border-yellow-500/20 bg-black/95 md:hidden">
           <nav className="flex flex-col items-center gap-6 py-8">
-
-            {[
-              ["#home", "Home"],
-              ["#about", "About"],
-              ["#gallery", "Gallery"],
-              ["#history", "History"],
-              ["#timings", "Timings"],
-              ["#location", "Location"],
-              ["#contact", "Contact"],
-            ].map(([href, label]) => (
+            {navigation.map(([href, label]) => (
               <a
                 key={label}
                 href={href}
@@ -142,11 +138,13 @@ export default function Navbar() {
               </a>
             ))}
 
+            {/* Mobile Social Icons */}
             <div className="mt-4 flex gap-5">
               <a
                 href="https://www.youtube.com/@DarbareAshrafiBetul"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="YouTube"
               >
                 <FaYoutube className="text-3xl text-red-500" />
               </a>
@@ -155,6 +153,7 @@ export default function Navbar() {
                 href="https://www.facebook.com/share/192E1RyYXP/"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Facebook"
               >
                 <FaFacebook className="text-3xl text-blue-500" />
               </a>
@@ -163,6 +162,7 @@ export default function Navbar() {
                 href="https://www.instagram.com/darbar_e_ashrafi_betul"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Instagram"
               >
                 <FaInstagram className="text-3xl text-pink-500" />
               </a>
@@ -171,11 +171,11 @@ export default function Navbar() {
                 href="https://wa.me/917223021894"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="WhatsApp"
               >
                 <FaWhatsapp className="text-3xl text-green-500" />
               </a>
             </div>
-
           </nav>
         </div>
       )}

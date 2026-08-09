@@ -1,15 +1,7 @@
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
-import About from "./components/About";
-import Gallery from "./components/Gallery";
-import History from "./components/History";
-import Contact from "./components/Contact";
 import Footer from "./components/Footer";
-import PrayerTimings from "./components/PrayerTimings";
-import Map from "./components/Map";
 import FloatingWhatsapp from "./components/FloatingWhatsapp";
-import Videos from "./components/Videos";
-import ScrollToTop from "./components/ScrollToTop";
 
 export default function Home() {
   return (
@@ -18,25 +10,9 @@ export default function Home() {
 
       <Hero />
 
-      <About />
-
-      <Gallery />
-
-      <History />
-
-      <Contact />
-
-      <PrayerTimings />
-
-      <Map />
+      <Footer />
 
       <FloatingWhatsapp />
-
-      <Videos />
-
-      <Footer />
-      
-      <ScrollToTop />
     </main>
   );
 }
