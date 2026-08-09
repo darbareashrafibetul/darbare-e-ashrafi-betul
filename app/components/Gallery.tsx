@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaTimes } from "react-icons/fa";
 
 const images = Array.from(
-  { length: 15 },
+  { length: 14 },
   (_, index) => `/images/gallery${index + 1}.jpg`
 );
 
