@@ -1,113 +1,792 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import { FaTimes } from "react-icons/fa";
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+} from "framer-motion";
+import {
+  FaChevronLeft,
+  FaChevronRight,
+  FaExpand,
+  FaTimes,
+} from "react-icons/fa";
+
+/* =========================================================
+   GALLERY DATA
+========================================================= */
 
 const images = Array.from(
   { length: 14 },
   (_, index) => `/images/gallery${index + 1}.jpg`
 );
 
+const ease = [0.22, 1, 0.36, 1] as const;
+
+/* =========================================================
+   ORNAMENT
+========================================================= */
+
+function Ornament({
+  large = false,
+}: {
+  large?: boolean;
+}) {
+  return (
+    <div
+      className={`flex items-center justify-center ${
+        large ? "gap-5" : "gap-3"
+      }`}
+      aria-hidden="true"
+    >
+      <span
+        className={`h-px bg-gradient-to-r from-transparent to-[#C9A227]/80 ${
+          large ? "w-24 sm:w-32" : "w-10 sm:w-14"
+        }`}
+      />
+
+      <motion.span
+        animate={{
+          rotate: [45, 135, 45],
+          scale: [1, 1.15, 1],
+        }}
+        transition={{
+          duration: 5,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className={`rotate-45 border border-[#C9A227] bg-[#C9A227]/10 ${
+          large ? "h-3.5 w-3.5" : "h-2 w-2"
+        }`}
+      />
+
+      <span
+        className={`h-px bg-gradient-to-l from-transparent to-[#C9A227]/80 ${
+          large ? "w-24 sm:w-32" : "w-10 sm:w-14"
+        }`}
+      />
+    </div>
+  );
+}
+
+/* =========================================================
+   FLOATING PARTICLES
+========================================================= */
+
+function FloatingParticles({
+  reduceMotion,
+}: {
+  reduceMotion: boolean | null;
+}) {
+  if (reduceMotion) return null;
+
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 overflow-hidden"
+      aria-hidden="true"
+    >
+      {Array.from({ length: 18 }).map((_, index) => (
+        <motion.span
+          key={index}
+          initial={{
+            opacity: 0,
+            y: 30,
+          }}
+          animate={{
+            opacity: [0, 0.3, 0],
+            y: [-10, -130],
+            x: [0, index % 2 === 0 ? 22 : -22],
+          }}
+          transition={{
+            duration: 6 + (index % 5),
+            repeat: Infinity,
+            delay: index * 0.35,
+            ease: "easeOut",
+          }}
+          className="absolute h-1 w-1 rounded-full bg-[#C9A227]"
+          style={{
+            left: `${4 + ((index * 17) % 92)}%`,
+            top: `${25 + ((index * 13) % 70)}%`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/* =========================================================
+   GALLERY CARD
+========================================================= */
+
+function GalleryCard({
+  image,
+  index,
+  onOpen,
+  reduceMotion,
+}: {
+  image: string;
+  index: number;
+  onOpen: () => void;
+  reduceMotion: boolean | null;
+}) {
+  /*
+    Different sizes create the premium masonry-like rhythm.
+  */
+
+  const featured =
+    index === 0 ||
+    index === 5 ||
+    index === 9;
+
+  return (
+    <motion.button
+      type="button"
+      onClick={onOpen}
+      initial={{
+        opacity: 0,
+        y: 50,
+        scale: 0.96,
+      }}
+      whileInView={{
+        opacity: 1,
+        y: 0,
+        scale: 1,
+      }}
+      viewport={{
+        once: true,
+        amount: 0.12,
+      }}
+      transition={{
+        duration: 0.8,
+        delay: (index % 5) * 0.08,
+        ease,
+      }}
+      whileHover={
+        reduceMotion
+          ? undefined
+          : {
+              y: -8,
+            }
+      }
+      whileTap={
+        reduceMotion
+          ? undefined
+          : {
+              scale: 0.985,
+            }
+      }
+      aria-label={`Open gallery image ${index + 1}`}
+      className={`group relative w-full overflow-hidden rounded-[2rem] border border-[#C9A227]/20 bg-white/55 p-1 text-left shadow-[0_25px_70px_rgba(23,55,43,0.09)] backdrop-blur-xl ${
+        featured
+          ? "md:row-span-2"
+          : ""
+      }`}
+    >
+      {/* =================================================
+          OUTER GOLD GLOW
+      ================================================== */}
+
+      {!reduceMotion && (
+        <motion.span
+          animate={{
+            opacity: [0.05, 0.12, 0.05],
+            scale: [1, 1.06, 1],
+          }}
+          transition={{
+            duration: 7,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: index * 0.2,
+          }}
+          className="pointer-events-none absolute -inset-10 -z-10 rounded-full bg-[#C9A227]/30 blur-[55px]"
+        />
+      )}
+
+      {/* =================================================
+          IMAGE FRAME
+      ================================================== */}
+
+      <div
+        className={`relative overflow-hidden rounded-[1.7rem] ${
+          featured
+            ? "h-[430px] sm:h-[520px] md:h-full"
+            : "h-[270px] sm:h-[310px]"
+        }`}
+      >
+        <Image
+          src={image}
+          alt={`Darbare e Ashrafi Betul Gallery ${index + 1}`}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.08]"
+          priority={index < 2}
+        />
+
+        {/* Dark cinematic overlay */}
+
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#17372B]/70 via-transparent to-[#17372B]/5 opacity-80" />
+
+        {/* Golden light */}
+
+        <motion.div
+          className="pointer-events-none absolute -left-1/2 top-0 h-full w-1/3 rotate-[18deg] bg-gradient-to-r from-transparent via-white/20 to-transparent blur-xl"
+          initial={{
+            x: "-100%",
+          }}
+          whileHover={{
+            x: "500%",
+          }}
+          transition={{
+            duration: 1.1,
+            ease: "easeInOut",
+          }}
+        />
+
+        {/* =================================================
+            HOVER BORDER
+        ================================================== */}
+
+        <span className="pointer-events-none absolute inset-2 rounded-[1.4rem] border border-white/10 transition-colors duration-500 group-hover:border-[#E1C76A]/60" />
+
+        {/* =================================================
+            TOP NUMBER
+        ================================================== */}
+
+        <div className="absolute left-5 top-5 flex h-9 w-9 items-center justify-center rounded-full border border-[#E1C76A]/50 bg-[#17372B]/60 text-[10px] font-bold tracking-widest text-[#E1C76A] backdrop-blur-md">
+          {String(index + 1).padStart(2, "0")}
+        </div>
+
+        {/* =================================================
+            VIEW ICON
+        ================================================== */}
+
+        <div className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-[#17372B]/45 text-white opacity-0 backdrop-blur-md transition-all duration-500 group-hover:scale-100 group-hover:opacity-100">
+          <FaExpand className="text-xs" />
+        </div>
+
+        {/* =================================================
+            BOTTOM INFO
+        ================================================== */}
+
+        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
+          <div className="flex items-center gap-3">
+            <span className="h-px w-10 bg-[#E1C76A]/80" />
+
+            <span className="text-[9px] font-bold uppercase tracking-[0.35em] text-[#F1D77A]">
+              Darbare e Ashrafi
+            </span>
+          </div>
+
+          <p className="mt-2 text-xs font-medium tracking-wide text-white/80">
+            Betul • Gallery {String(index + 1).padStart(2, "0")}
+          </p>
+        </div>
+      </div>
+    </motion.button>
+  );
+}
+
+/* =========================================================
+   LIGHTBOX
+========================================================= */
+
+function Lightbox({
+  selectedIndex,
+  onClose,
+  onPrevious,
+  onNext,
+  reduceMotion,
+}: {
+  selectedIndex: number;
+  onClose: () => void;
+  onPrevious: () => void;
+  onNext: () => void;
+  reduceMotion: boolean | null;
+}) {
+  const image = images[selectedIndex];
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#07150F]/95 p-4 backdrop-blur-xl sm:p-6 md:p-10"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      {/* =================================================
+          BACKGROUND GOLD ATMOSPHERE
+      ================================================== */}
+
+      <div
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#C9A227]/[0.06] blur-[130px]"
+        aria-hidden="true"
+      />
+
+      {/* =================================================
+          CLOSE
+      ================================================== */}
+
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close gallery viewer"
+        className="absolute right-4 top-4 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-[#C9A227]/30 bg-white/10 text-white backdrop-blur-md transition-all duration-300 hover:border-[#C9A227]/70 hover:bg-[#C9A227] hover:text-[#17372B] sm:right-6 sm:top-6"
+      >
+        <FaTimes />
+      </button>
+
+      {/* =================================================
+          PREVIOUS
+      ================================================== */}
+
+      <button
+        type="button"
+        onClick={(event) => {
+          event.stopPropagation();
+          onPrevious();
+        }}
+        aria-label="Previous image"
+        className="absolute left-3 top-1/2 z-50 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-[#C9A227]/30 bg-[#17372B]/70 text-white backdrop-blur-md transition-all duration-300 hover:border-[#C9A227] hover:bg-[#C9A227] hover:text-[#17372B] sm:left-6 sm:h-14 sm:w-14"
+      >
+        <FaChevronLeft />
+      </button>
+
+      {/* =================================================
+          NEXT
+      ================================================== */}
+
+      <button
+        type="button"
+        onClick={(event) => {
+          event.stopPropagation();
+          onNext();
+        }}
+        aria-label="Next image"
+        className="absolute right-3 top-1/2 z-50 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-[#C9A227]/30 bg-[#17372B]/70 text-white backdrop-blur-md transition-all duration-300 hover:border-[#C9A227] hover:bg-[#C9A227] hover:text-[#17372B] sm:right-6 sm:h-14 sm:w-14"
+      >
+        <FaChevronRight />
+      </button>
+
+      {/* =================================================
+          IMAGE
+      ================================================== */}
+
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={image}
+          initial={
+            reduceMotion
+              ? { opacity: 0 }
+              : {
+                  opacity: 0,
+                  scale: 0.94,
+                  y: 15,
+                }
+          }
+          animate={{
+            opacity: 1,
+            scale: 1,
+            y: 0,
+          }}
+          exit={
+            reduceMotion
+              ? { opacity: 0 }
+              : {
+                  opacity: 0,
+                  scale: 0.96,
+                }
+          }
+          transition={{
+            duration: 0.45,
+            ease,
+          }}
+          onClick={(event) =>
+            event.stopPropagation()
+          }
+          className="relative max-h-[82vh] max-w-[88vw]"
+        >
+          {/* Image gold frame */}
+
+          <div className="absolute -inset-2 rounded-[1.7rem] border border-[#C9A227]/30 sm:-inset-3" />
+
+          <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#17372B] shadow-[0_40px_120px_rgba(0,0,0,0.5)]">
+            <Image
+              src={image}
+              alt={`Darbare e Ashrafi Betul Gallery ${selectedIndex + 1}`}
+              width={1600}
+              height={1100}
+              className="max-h-[78vh] w-auto max-w-[86vw] object-contain"
+              priority
+            />
+          </div>
+
+          {/* =================================================
+              COUNTER
+          ================================================== */}
+
+          <div className="absolute -bottom-14 left-1/2 flex -translate-x-1/2 items-center gap-3 whitespace-nowrap">
+            <span className="h-px w-8 bg-[#C9A227]/50" />
+
+            <span className="text-[10px] font-bold tracking-[0.35em] text-[#E1C76A]">
+              {String(selectedIndex + 1).padStart(2, "0")} /{" "}
+              {String(images.length).padStart(2, "0")}
+            </span>
+
+            <span className="h-px w-8 bg-[#C9A227]/50" />
+          </div>
+        </motion.div>
+      </AnimatePresence>
+
+      {/* =================================================
+          BOTTOM HINT
+      ================================================== */}
+
+      <div className="absolute bottom-5 left-1/2 hidden -translate-x-1/2 text-[9px] uppercase tracking-[0.3em] text-white/35 sm:block">
+        Click outside to close
+      </div>
+    </motion.div>
+  );
+}
+
+/* =========================================================
+   MAIN GALLERY
+========================================================= */
+
 export default function Gallery() {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedIndex, setSelectedIndex] =
+    useState<number | null>(null);
+
+  const reduceMotion = useReducedMotion();
+
+  /* =======================================================
+     KEYBOARD CONTROLS
+  ====================================================== */
+
+  useEffect(() => {
+    if (selectedIndex === null) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setSelectedIndex(null);
+      }
+
+      if (event.key === "ArrowLeft") {
+        setSelectedIndex((current) => {
+          if (current === null) return null;
+
+          return (
+            (current - 1 + images.length) %
+            images.length
+          );
+        });
+      }
+
+      if (event.key === "ArrowRight") {
+        setSelectedIndex((current) => {
+          if (current === null) return null;
+
+          return (
+            (current + 1) %
+            images.length
+          );
+        });
+      }
+    };
+
+    window.addEventListener(
+      "keydown",
+      handleKeyDown
+    );
+
+    return () => {
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown
+      );
+    };
+  }, [selectedIndex]);
+
+  /* =======================================================
+     LOCK BODY SCROLL WHILE LIGHTBOX IS OPEN
+  ====================================================== */
+
+  useEffect(() => {
+    if (selectedIndex === null) return;
+
+    const originalOverflow =
+      document.body.style.overflow;
+
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow =
+        originalOverflow;
+    };
+  }, [selectedIndex]);
+
+  const previousImage = () => {
+    setSelectedIndex((current) => {
+      if (current === null) return null;
+
+      return (
+        (current - 1 + images.length) %
+        images.length
+      );
+    });
+  };
+
+  const nextImage = () => {
+    setSelectedIndex((current) => {
+      if (current === null) return null;
+
+      return (
+        (current + 1) % images.length
+      );
+    });
+  };
 
   return (
     <>
+      {/* =====================================================
+          GALLERY SECTION
+      ====================================================== */}
+
       <section
         id="gallery"
-        className="bg-gradient-to-b from-black to-green-950 px-6 py-24"
+        className="relative isolate overflow-hidden bg-[#F5F0E4] px-4 py-24 text-[#17372B] sm:px-6 sm:py-28 lg:px-8 lg:py-36"
       >
-        <div className="mx-auto max-w-7xl">
+        {/* =================================================
+            BACKGROUND ATMOSPHERE
+        ================================================== */}
 
-          {/* Gallery Heading */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="text-center"
+        <div
+          className="pointer-events-none absolute inset-0 -z-10"
+          aria-hidden="true"
+        >
+          {!reduceMotion && (
+            <>
+              {/* Gold top glow */}
+
+              <motion.div
+                animate={{
+                  scale: [1, 1.1, 1],
+                  opacity: [0.05, 0.12, 0.05],
+                }}
+                transition={{
+                  duration: 12,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="absolute left-1/2 top-[-320px] h-[650px] w-[650px] -translate-x-1/2 rounded-full bg-[#C9A227]/30 blur-[170px]"
+              />
+
+              {/* Green left glow */}
+
+              <motion.div
+                animate={{
+                  x: [-60, 60, -60],
+                  y: [0, 50, 0],
+                }}
+                transition={{
+                  duration: 16,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="absolute -left-[260px] top-[30%] h-[500px] w-[500px] rounded-full bg-[#17372B]/[0.06] blur-[150px]"
+              />
+
+              {/* Gold right glow */}
+
+              <motion.div
+                animate={{
+                  x: [60, -60, 60],
+                  y: [0, -50, 0],
+                }}
+                transition={{
+                  duration: 18,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="absolute -right-[260px] bottom-[10%] h-[520px] w-[520px] rounded-full bg-[#C9A227]/[0.07] blur-[150px]"
+              />
+            </>
+          )}
+
+          {/* Subtle heritage texture */}
+
+          <div
+            className="absolute inset-0 opacity-[0.035]"
+            style={{
+              backgroundImage:
+                "radial-gradient(circle, #17372B 1px, transparent 1px)",
+              backgroundSize: "34px 34px",
+            }}
+          />
+
+          {/* Central atmospheric glow */}
+
+          <div className="absolute left-1/2 top-[35%] h-[55%] w-[260px] -translate-x-1/2 rounded-full bg-[#17372B]/[0.018] blur-[100px]" />
+        </div>
+
+        <FloatingParticles
+          reduceMotion={reduceMotion}
+        />
+
+        {/* =================================================
+            HERITAGE FRAME
+        ================================================== */}
+
+        <div
+          className="pointer-events-none absolute inset-3 rounded-[2rem] border border-[#C9A227]/20 sm:inset-6 sm:rounded-[2.5rem] lg:inset-9 lg:rounded-[3rem]"
+          aria-hidden="true"
+        >
+          <span className="absolute left-0 top-0 h-20 w-20 rounded-tl-[2rem] border-l border-t border-[#C9A227]/60 sm:h-24 sm:w-24" />
+
+          <span className="absolute right-0 top-0 h-20 w-20 rounded-tr-[2rem] border-r border-t border-[#C9A227]/45 sm:h-24 sm:w-24" />
+
+          <span className="absolute bottom-0 left-0 h-20 w-20 rounded-bl-[2rem] border-b border-l border-[#C9A227]/45 sm:h-24 sm:w-24" />
+
+          <span className="absolute bottom-0 right-0 h-20 w-20 rounded-br-[2rem] border-b border-r border-[#C9A227]/60 sm:h-24 sm:w-24" />
+        </div>
+
+        {/* =================================================
+            MAIN CONTENT
+        ================================================== */}
+
+        <div className="relative z-10 mx-auto max-w-7xl">
+          {/* =================================================
+              HEADER
+          ================================================== */}
+
+          <motion.header
+            initial={{
+              opacity: 0,
+              y: 40,
+              filter: "blur(8px)",
+            }}
+            whileInView={{
+              opacity: 1,
+              y: 0,
+              filter: "blur(0px)",
+            }}
+            viewport={{
+              once: true,
+              amount: 0.2,
+            }}
+            transition={{
+              duration: 0.9,
+              ease,
+            }}
+            className="mx-auto max-w-4xl text-center"
           >
-            <h2 className="text-5xl font-bold text-yellow-300">
+            {/* Label */}
+
+            <div className="flex items-center justify-center gap-4">
+              <span className="h-px w-12 bg-gradient-to-r from-transparent to-[#C9A227]" />
+
+              <span className="text-[10px] font-bold uppercase tracking-[0.42em] text-[#80620F] sm:text-xs">
+                Our Memories
+              </span>
+
+              <span className="h-px w-12 bg-gradient-to-l from-transparent to-[#C9A227]" />
+            </div>
+
+            {/* Ornament */}
+
+            <div className="mt-8">
+              <Ornament large />
+            </div>
+
+            {/* Title */}
+
+            <h2 className="mt-8 bg-gradient-to-b from-[#E1C76A] via-[#C9A227] to-[#745A13] bg-clip-text text-5xl font-black leading-[1.05] tracking-[-0.04em] text-transparent sm:text-6xl lg:text-[5rem]">
               Gallery
             </h2>
 
-            <p className="mx-auto mt-4 max-w-2xl text-gray-300">
-              Beautiful moments and memories from Darbare e Ashrafi Betul.
-            </p>
-          </motion.div>
+            {/* Description */}
 
-          {/* Gallery Grid */}
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {images.map((img, index) => (
-              <motion.button
-                key={img}
-                type="button"
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.5,
-                  delay: (index % 6) * 0.08,
-                }}
-                whileHover={{ scale: 1.03 }}
-                onClick={() => setSelectedImage(img)}
-                className="group cursor-pointer overflow-hidden rounded-2xl border border-yellow-500/30 bg-black/30 text-left shadow-xl"
-                aria-label={`Open gallery image ${index + 1}`}
-              >
-                <Image
-                  src={img}
-                  alt={`Darbare e Ashrafi Betul Gallery ${index + 1}`}
-                  width={800}
-                  height={550}
-                  className="h-64 w-full object-cover transition duration-500 group-hover:scale-110"
-                />
-              </motion.button>
+            <p className="mx-auto mt-6 max-w-2xl text-sm leading-8 text-[#49675B] sm:text-base sm:leading-9">
+              Beautiful moments, sacred memories and
+              glimpses from the spiritual journey of
+              Darbare e Ashrafi Betul.
+            </p>
+
+            <div className="mt-7">
+              <Ornament />
+            </div>
+          </motion.header>
+
+          {/* =================================================
+              CONNECTING GOLD LINE
+          ================================================== */}
+
+          <div
+            className="pointer-events-none absolute left-1/2 top-[520px] hidden h-[calc(100%-700px)] w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-[#C9A227]/25 to-transparent lg:block"
+            aria-hidden="true"
+          />
+
+          {/* =================================================
+              GALLERY GRID
+          ================================================== */}
+
+          <div className="relative mt-16 grid auto-rows-[270px] grid-cols-1 gap-6 sm:mt-20 sm:grid-cols-2 sm:auto-rows-[300px] lg:grid-cols-3 lg:gap-7">
+            {images.map((image, index) => (
+              <GalleryCard
+                key={image}
+                image={image}
+                index={index}
+                onOpen={() =>
+                  setSelectedIndex(index)
+                }
+                reduceMotion={reduceMotion}
+              />
             ))}
           </div>
 
+          {/* =================================================
+              BOTTOM ORNAMENT
+          ================================================== */}
+
+          <motion.div
+            initial={{
+              opacity: 0,
+              scaleX: 0,
+            }}
+            whileInView={{
+              opacity: 1,
+              scaleX: 1,
+            }}
+            viewport={{
+              once: true,
+            }}
+            transition={{
+              duration: 1.2,
+              ease,
+            }}
+            className="mt-20 flex justify-center"
+          >
+            <Ornament large />
+          </motion.div>
         </div>
       </section>
 
-      {/* Fullscreen Image Viewer */}
-      <AnimatePresence>
-        {selectedImage && (
-          <motion.div
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4 md:p-8"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedImage(null)}
-          >
-            {/* Close Button */}
-            <button
-              type="button"
-              onClick={() => setSelectedImage(null)}
-              aria-label="Close image"
-              className="absolute right-5 top-5 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-2xl text-white transition hover:bg-red-500"
-            >
-              <FaTimes />
-            </button>
+      {/* =====================================================
+          LIGHTBOX
+      ====================================================== */}
 
-            {/* Large Image */}
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              onClick={(event) => event.stopPropagation()}
-              className="relative max-h-[90vh] max-w-[95vw]"
-            >
-              <Image
-                src={selectedImage}
-                alt="Darbare e Ashrafi Betul Gallery"
-                width={1400}
-                height={900}
-                className="max-h-[90vh] w-auto rounded-2xl object-contain shadow-2xl"
-              />
-            </motion.div>
-          </motion.div>
+      <AnimatePresence>
+        {selectedIndex !== null && (
+          <Lightbox
+            selectedIndex={selectedIndex}
+            onClose={() =>
+              setSelectedIndex(null)
+            }
+            onPrevious={previousImage}
+            onNext={nextImage}
+            reduceMotion={reduceMotion}
+          />
         )}
       </AnimatePresence>
     </>

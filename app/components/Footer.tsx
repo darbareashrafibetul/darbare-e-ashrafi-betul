@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import Link from "next/link";
+import { motion, type Variants } from "framer-motion";
 import {
   FaYoutube,
   FaFacebook,
@@ -9,189 +10,551 @@ import {
   FaMapMarkerAlt,
   FaPhoneAlt,
   FaEnvelope,
+  FaArrowUp,
+  FaArrowRight,
 } from "react-icons/fa";
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+const fadeUp: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 28,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.7,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+
+const fadeLeft: Variants = {
+  hidden: {
+    opacity: 0,
+    x: -25,
+  },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.7,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+
+const fadeRight: Variants = {
+  hidden: {
+    opacity: 0,
+    x: 25,
+  },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.7,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+
+const stagger: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
+};
+
+/* =========================================================
+   DATA
+========================================================= */
+
+const quickLinks = [
+  { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
+  { label: "History", href: "/history" },
+  { label: "Gallery", href: "/gallery" },
+  { label: "Videos", href: "/videos" },
+  { label: "Timings", href: "/timings" },
+  { label: "Location", href: "/location" },
+  { label: "Contact", href: "/contact" },
+];
+
+const socialLinks = [
+  {
+    label: "YouTube",
+    href: "https://www.youtube.com/@DarbareAshrafiBetul",
+    icon: FaYoutube,
+    color: "text-[#FF0000]",
+    hover: "hover:border-[#FF0000]/40 hover:bg-[#FF0000]/10",
+  },
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/share/192E1RyYXP/",
+    icon: FaFacebook,
+    color: "text-[#1877F2]",
+    hover: "hover:border-[#1877F2]/40 hover:bg-[#1877F2]/10",
+  },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/darbar_e_ashrafi_betul",
+    icon: FaInstagram,
+    color: "text-[#E1306C]",
+    hover: "hover:border-[#E1306C]/40 hover:bg-[#E1306C]/10",
+  },
+  {
+    label: "WhatsApp",
+    href: "https://wa.me/917223021894",
+    icon: FaWhatsapp,
+    color: "text-[#25D366]",
+    hover: "hover:border-[#25D366]/40 hover:bg-[#25D366]/10",
+  },
+];
+
+/* =========================================================
+   FOOTER
+========================================================= */
 
 export default function Footer() {
   return (
-    <footer className="relative overflow-hidden border-t border-yellow-500/20 bg-gradient-to-b from-green-950 via-black to-black px-6 py-16 text-white">
-      
-      {/* Background Glow */}
+    <footer className="relative overflow-hidden border-t border-[#C9A227]/25 bg-[#102A21] text-[#F5F1E6]">
+
+      {/* =====================================================
+          BACKGROUND
+      ====================================================== */}
+
       <div
-        className="pointer-events-none absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 rounded-full bg-yellow-500/10 blur-3xl"
+        className="pointer-events-none absolute inset-0"
         aria-hidden="true"
+      >
+        {/* Main background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#173C2F] via-[#102A21] to-[#091B15]" />
+
+        {/* Golden atmosphere */}
+        <motion.div
+          animate={{
+            opacity: [0.08, 0.16, 0.08],
+            scale: [1, 1.08, 1],
+          }}
+          transition={{
+            duration: 9,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute left-1/2 top-[-220px] h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-[#C9A227] blur-[130px]"
+        />
+
+        {/* Left atmosphere */}
+        <motion.div
+          animate={{
+            x: [0, 30, 0],
+            opacity: [0.025, 0.07, 0.025],
+          }}
+          transition={{
+            duration: 11,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute -left-48 top-1/3 h-[400px] w-[400px] rounded-full bg-[#C9A227] blur-[130px]"
+        />
+
+        {/* Right atmosphere */}
+        <motion.div
+          animate={{
+            x: [0, -30, 0],
+            opacity: [0.02, 0.06, 0.02],
+          }}
+          transition={{
+            duration: 13,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute -right-48 bottom-0 h-[420px] w-[420px] rounded-full bg-[#C9A227] blur-[140px]"
+        />
+
+        {/* Fine pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.025]"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, #E5C45A 1px, transparent 1px)",
+            backgroundSize: "30px 30px",
+          }}
+        />
+      </div>
+
+      {/* =====================================================
+          TOP GOLDEN ACCENT
+      ====================================================== */}
+
+      <motion.div
+        initial={{
+          scaleX: 0,
+          opacity: 0,
+        }}
+        whileInView={{
+          scaleX: 1,
+          opacity: 1,
+        }}
+        viewport={{
+          once: true,
+          amount: 0.5,
+        }}
+        transition={{
+          duration: 1.1,
+          ease: [0.22, 1, 0.36, 1],
+        }}
+        className="relative h-px w-full origin-center bg-gradient-to-r from-transparent via-[#C9A227] to-transparent"
       />
 
-      <div className="relative z-10 mx-auto max-w-7xl">
+      {/* =====================================================
+          MAIN CONTAINER
+      ====================================================== */}
 
-        {/* Main Footer */}
-        <div className="grid gap-10 md:grid-cols-3">
+      <div className="relative z-10 mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-16 lg:px-10 lg:py-20">
 
-          {/* Brand */}
-          <motion.div
-            initial={{ opacity: 0, y: 25 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center md:text-left"
-          >
-            <h3 className="text-3xl font-bold text-yellow-300">
-              Darbare e Ashrafi Betul
+        {/* ===================================================
+            TOP MESSAGE
+        ==================================================== */}
+
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{
+            once: true,
+            amount: 0.25,
+          }}
+          className="mx-auto mb-14 max-w-3xl text-center"
+        >
+          <span className="inline-flex items-center gap-2 text-[9px] font-semibold uppercase tracking-[0.35em] text-[#C9A227]/75 sm:text-[10px]">
+            <span className="h-px w-7 bg-[#C9A227]/50" />
+            Darbare e Ashrafi Betul
+            <span className="h-px w-7 bg-[#C9A227]/50" />
+          </span>
+
+          <h2 className="mt-4 text-2xl font-bold tracking-tight text-[#F5F1E6] sm:text-3xl">
+            Peace, Faith &amp; Devotion
+          </h2>
+
+          <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-[#EAE0CC]/55 sm:text-base">
+            May this sacred place continue to spread peace, blessings,
+            service and spiritual guidance to everyone who visits.
+          </p>
+        </motion.div>
+
+        {/* ===================================================
+            MAIN GRID
+        ==================================================== */}
+
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{
+            once: true,
+            amount: 0.18,
+          }}
+          className="grid gap-12 md:grid-cols-[1.1fr_1fr_1.1fr] md:gap-10 lg:gap-16"
+        >
+
+          {/* =================================================
+              EXPLORE
+          ================================================== */}
+
+          <motion.div variants={fadeLeft}>
+            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-[#C9A227]">
+              Explore
+            </p>
+
+            <h3 className="mt-2 text-xl font-bold text-[#F5F1E6]">
+              Quick Links
             </h3>
 
-            <p className="mt-2 text-green-200">
-              Makhdoom Baba Darbar
-            </p>
-
-            <p className="mt-5 max-w-md leading-7 text-gray-400">
-              A spiritual place of peace, faith, service and blessings.
-              May Allah bless everyone with peace, good health and guidance.
-            </p>
-          </motion.div>
-
-          {/* Quick Links */}
-          <motion.div
-            initial={{ opacity: 0, y: 25 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-center"
-          >
-            <h4 className="mb-5 text-xl font-bold text-yellow-300">
-              Quick Links
-            </h4>
-
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-3">
-              {[
-                ["#home", "Home"],
-                ["#about", "About"],
-                ["#gallery", "Gallery"],
-                ["#history", "History"],
-                ["#timings", "Timings"],
-                ["#location", "Location"],
-                ["#contact", "Contact"],
-              ].map(([href, label]) => (
-                <a
-                  key={label}
-                  href={href}
-                  className="text-gray-400 transition duration-300 hover:text-yellow-300"
+            <div className="mt-6 grid grid-cols-2 gap-x-8 gap-y-2">
+              {quickLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className="group flex items-center gap-2 py-1.5 text-sm text-[#EAE0CC]/55 transition-all duration-300 hover:text-[#C9A227]"
                 >
-                  {label}
-                </a>
+                  <span className="h-1 w-1 rotate-45 bg-[#C9A227]/40 transition-all duration-300 group-hover:scale-150 group-hover:bg-[#C9A227]" />
+
+                  <span className="transition-transform duration-300 group-hover:translate-x-1">
+                    {link.label}
+                  </span>
+                </Link>
               ))}
             </div>
           </motion.div>
 
-          {/* Contact */}
-          <motion.div
-            initial={{ opacity: 0, y: 25 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-center md:text-left"
-          >
-            <h4 className="mb-5 text-xl font-bold text-yellow-300">
+          {/* =================================================
+              CONTACT
+          ================================================== */}
+
+          <motion.div variants={fadeUp}>
+            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-[#C9A227]">
+              Reach Us
+            </p>
+
+            <h3 className="mt-2 text-xl font-bold text-[#F5F1E6]">
               Contact
-            </h4>
+            </h3>
 
-            <div className="space-y-4 text-gray-400">
+            <div className="mt-6 space-y-5">
 
-              <a
+              {/* Location */}
+              <Link
                 href="/location"
-                className="flex items-center justify-center gap-3 transition hover:text-yellow-300 md:justify-start"
+                className="group flex items-start gap-4"
               >
-                <FaMapMarkerAlt className="text-yellow-400" />
-                <span>Betul, Madhya Pradesh</span>
-              </a>
+                <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#C9A227]/20 bg-[#C9A227]/5 transition-all duration-300 group-hover:border-[#C9A227]/50 group-hover:bg-[#C9A227]/10">
+                  <FaMapMarkerAlt className="text-sm text-[#C9A227]" />
+                </span>
 
+                <span>
+                  <span className="block text-[9px] uppercase tracking-[0.18em] text-[#C9A227]/55">
+                    Location
+                  </span>
+
+                  <span className="mt-1 block text-sm text-[#EAE0CC]/65 transition-colors duration-300 group-hover:text-[#C9A227]">
+                    Betul, Madhya Pradesh
+                  </span>
+                </span>
+              </Link>
+
+              {/* Phone */}
               <a
                 href="tel:+917223021894"
-                className="flex items-center justify-center gap-3 transition hover:text-yellow-300 md:justify-start"
+                className="group flex items-start gap-4"
               >
-                <FaPhoneAlt className="text-yellow-400" />
-                <span>+91 72230 21894</span>
+                <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#C9A227]/20 bg-[#C9A227]/5 transition-all duration-300 group-hover:border-[#C9A227]/50 group-hover:bg-[#C9A227]/10">
+                  <FaPhoneAlt className="text-sm text-[#C9A227]" />
+                </span>
+
+                <span>
+                  <span className="block text-[9px] uppercase tracking-[0.18em] text-[#C9A227]/55">
+                    Phone
+                  </span>
+
+                  <span className="mt-1 block text-sm text-[#EAE0CC]/65 transition-colors duration-300 group-hover:text-[#C9A227]">
+                    +91 72230 21894
+                  </span>
+                </span>
               </a>
 
+              {/* Email */}
               <a
                 href="mailto:info@darbareashrafibetul.com"
-                className="flex items-center justify-center gap-3 transition hover:text-yellow-300 md:justify-start"
+                className="group flex items-start gap-4"
               >
-                <FaEnvelope className="text-yellow-400" />
-                <span>info@darbareashrafibetul.com</span>
-              </a>
+                <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#C9A227]/20 bg-[#C9A227]/5 transition-all duration-300 group-hover:border-[#C9A227]/50 group-hover:bg-[#C9A227]/10">
+                  <FaEnvelope className="text-sm text-[#C9A227]" />
+                </span>
 
+                <span className="min-w-0">
+                  <span className="block text-[9px] uppercase tracking-[0.18em] text-[#C9A227]/55">
+                    Email
+                  </span>
+
+                  <span className="mt-1 block truncate text-sm text-[#EAE0CC]/65 transition-colors duration-300 group-hover:text-[#C9A227]">
+                    info@darbareashrafibetul.com
+                  </span>
+                </span>
+              </a>
             </div>
           </motion.div>
 
-        </div>
+          {/* =================================================
+              CONNECT
+          ================================================== */}
 
-        {/* Divider */}
-        <div className="my-10 h-px bg-gradient-to-r from-transparent via-yellow-500/40 to-transparent" />
+          <motion.div variants={fadeRight}>
+            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-[#C9A227]">
+              Stay Connected
+            </p>
 
-        {/* Social Icons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="flex justify-center gap-4"
-        >
+            <h3 className="mt-2 text-xl font-bold text-[#F5F1E6]">
+              Follow Us
+            </h3>
 
-          <a
-            href="https://www.youtube.com/@DarbareAshrafiBetul"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="YouTube"
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-red-500/30 bg-white/5 text-red-500 backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:bg-red-500/10"
-          >
-            <FaYoutube className="text-xl" />
-          </a>
+            <p className="mt-5 max-w-sm text-sm leading-7 text-[#EAE0CC]/55">
+              Follow our official social media channels for updates,
+              videos, events and moments from Darbare e Ashrafi Betul.
+            </p>
 
-          <a
-            href="https://www.facebook.com/share/192E1RyYXP/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Facebook"
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-blue-500/30 bg-white/5 text-blue-500 backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:bg-blue-500/10"
-          >
-            <FaFacebook className="text-xl" />
-          </a>
+            {/* Social Icons */}
+            <div className="mt-6 flex gap-3">
+              {socialLinks.map((social, index) => {
+                const Icon = social.icon;
 
-          <a
-            href="https://www.instagram.com/darbar_e_ashrafi_betul"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Instagram"
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-pink-500/30 bg-white/5 text-pink-500 backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:bg-pink-500/10"
-          >
-            <FaInstagram className="text-xl" />
-          </a>
+                return (
+                  <motion.a
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.label}
+                    initial={{
+                      opacity: 0,
+                      scale: 0.7,
+                      y: 12,
+                    }}
+                    whileInView={{
+                      opacity: 1,
+                      scale: 1,
+                      y: 0,
+                    }}
+                    viewport={{
+                      once: true,
+                      amount: 0.5,
+                    }}
+                    transition={{
+                      duration: 0.45,
+                      delay: index * 0.08,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    whileHover={{
+                      y: -5,
+                      scale: 1.08,
+                    }}
+                    whileTap={{
+                      scale: 0.92,
+                    }}
+                    className={`group relative flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.035] backdrop-blur-md transition-all duration-300 ${social.hover}`}
+                  >
+                    <Icon
+                      className={`relative z-10 text-lg ${social.color}`}
+                    />
+                  </motion.a>
+                );
+              })}
+            </div>
 
-          <a
-            href="https://wa.me/917223021894"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="WhatsApp"
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-green-500/30 bg-white/5 text-green-500 backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:bg-green-500/10"
-          >
-            <FaWhatsapp className="text-xl" />
-          </a>
+            {/* WhatsApp */}
+            <motion.a
+              href="https://wa.me/917223021894"
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{
+                y: -2,
+              }}
+              whileTap={{
+                scale: 0.98,
+              }}
+              className="group mt-6 inline-flex items-center gap-2 rounded-full border border-[#25D366]/25 bg-[#25D366]/5 px-5 py-2.5 text-xs font-semibold text-[#25D366] transition-all duration-300 hover:border-[#25D366]/50 hover:bg-[#25D366]/10"
+            >
+              <FaWhatsapp className="text-sm" />
 
+              <span>Connect on WhatsApp</span>
+
+              <FaArrowRight className="text-[9px] transition-transform duration-300 group-hover:translate-x-1" />
+            </motion.a>
+          </motion.div>
         </motion.div>
 
-        {/* Bottom */}
-        <div className="mt-8 text-center">
+        {/* ===================================================
+            DIVIDER
+        ==================================================== */}
 
-          <p className="text-sm text-gray-500">
-            © 2026 Darbare e Ashrafi Betul. All Rights Reserved.
-          </p>
+        <motion.div
+          initial={{
+            scaleX: 0,
+            opacity: 0,
+          }}
+          whileInView={{
+            scaleX: 1,
+            opacity: 1,
+          }}
+          viewport={{
+            once: true,
+            amount: 0.5,
+          }}
+          transition={{
+            duration: 0.9,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          className="my-12 h-px origin-center bg-gradient-to-r from-transparent via-[#C9A227]/30 to-transparent"
+        />
 
-          <p className="mt-2 text-xs text-gray-600">
-            Built with faith, devotion and love.
-          </p>
+        {/* ===================================================
+            BOTTOM BAR
+        ==================================================== */}
 
-        </div>
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{
+            once: true,
+            amount: 0.5,
+          }}
+          className="flex flex-col items-center justify-between gap-5 text-center sm:flex-row sm:text-left"
+        >
+          {/* Copyright */}
+          <div>
+            <p className="text-xs text-[#EAE0CC]/45 sm:text-sm">
+              © 2026 Darbare e Ashrafi Betul. All Rights Reserved.
+            </p>
 
+            <p className="mt-1.5 text-[10px] text-[#C9A227]/40 sm:text-xs">
+              Built with faith, devotion and love.
+            </p>
+          </div>
+
+          {/* Back To Top */}
+          <motion.button
+            type="button"
+            onClick={() => {
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              });
+            }}
+            whileHover={{
+              y: -3,
+            }}
+            whileTap={{
+              scale: 0.94,
+            }}
+            aria-label="Back to top"
+            className="group flex items-center gap-2 rounded-full border border-[#C9A227]/20 bg-[#C9A227]/5 px-4 py-2.5 text-xs font-semibold text-[#C9A227] transition-all duration-300 hover:border-[#C9A227]/50 hover:bg-[#C9A227]/10"
+          >
+            <span>Back to top</span>
+
+            <FaArrowUp className="text-[9px] transition-transform duration-300 group-hover:-translate-y-1" />
+          </motion.button>
+        </motion.div>
       </div>
+
+      {/* =====================================================
+          BOTTOM GOLD LINE
+      ====================================================== */}
+
+      <motion.div
+        initial={{
+          scaleX: 0,
+        }}
+        whileInView={{
+          scaleX: 1,
+        }}
+        viewport={{
+          once: true,
+          amount: 0.5,
+        }}
+        transition={{
+          duration: 1,
+          ease: [0.22, 1, 0.36, 1],
+        }}
+        className="relative h-[2px] w-full origin-center bg-gradient-to-r from-transparent via-[#C9A227]/60 to-transparent"
+      />
     </footer>
   );
 }
